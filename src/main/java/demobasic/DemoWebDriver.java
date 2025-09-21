@@ -9,6 +9,11 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+
 public class DemoWebDriver {
     public static void main(String[] args) throws InterruptedException {
         ChromeOptions options = new ChromeOptions();
@@ -19,6 +24,7 @@ public class DemoWebDriver {
 
         WebDriver driver = new ChromeDriver(options); // khoi tao 1 driver object co kieu ChromeDriver (process chromedriver.exe)
         driver.get("https://demo1.cybersoft.edu.vn/"); // navigate (mở) 1 site
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // đợi ngầm định 10s cho findElement
         driver.manage().window().maximize();
 
 //        WebDriver driver = new FirefoxDriver(); // geckodriver.exe
@@ -30,17 +36,22 @@ public class DemoWebDriver {
 //        WebDriver driver = new SafariDriver();
 //        driver.get("https://demo1.cybersoft.edu.vn/");
 
-        Thread.sleep(3000);
-
         //Step 1: Click link "Đăng Ký"
         By byBtnRegister = By.xpath("//h3[text()='Đăng Ký']");
-        WebElement btnRegister = driver.findElement(byBtnRegister);
+        ZonedDateTime start = ZonedDateTime.now();
+        System.out.println("Start = " + start);
+        WebElement btnRegister = driver.findElement(byBtnRegister); // throw exception "NoSuchElementException" neu ko thay element
+        ZonedDateTime end = ZonedDateTime.now();
+        System.out.println("End = " + end);
+        long duration = ChronoUnit.SECONDS.between(start, end);
+        System.out.println("Duration = " + duration);
         btnRegister.click();
 
         //Step 2: Enter account
+        String account = UUID.randomUUID().toString();
         By byTxtAccount = By.id("taiKhoan");
         WebElement txtAccount = driver.findElement(byTxtAccount);
-        txtAccount.sendKeys("N1111");
+        txtAccount.sendKeys(account);
 
         //Step 3: Enter password
         By byTxtPassword = By.id("matKhau");
@@ -58,9 +69,10 @@ public class DemoWebDriver {
         txtName.sendKeys("John A");
 
         //Step 6: Enter email
+        String email = account + "@example.com";
         By byTxtEmail = By.id("email");
         WebElement txtEmail = driver.findElement(byTxtEmail);
-        txtEmail.sendKeys("N1111@example.com");
+        txtEmail.sendKeys(email);
 
         //Step 7: Click register button
         By byBtnRegisterNewAcc = By.xpath("//button[.='Đăng ký']");
