@@ -1,4 +1,4 @@
-# This is an example html to demo css with "not" logical
+# This is an example html to demotestng css with "not" logical
 p:not(.valid)
 
 But CSS :not() only takes a simple selector (not complex logic):

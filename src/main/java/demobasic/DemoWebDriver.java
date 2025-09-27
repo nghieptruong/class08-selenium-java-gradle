@@ -1,6 +1,7 @@
 package demobasic;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -8,6 +9,9 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -24,7 +28,7 @@ public class DemoWebDriver {
 
         WebDriver driver = new ChromeDriver(options); // khoi tao 1 driver object co kieu ChromeDriver (process chromedriver.exe)
         driver.get("https://demo1.cybersoft.edu.vn/"); // navigate (mở) 1 site
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // đợi ngầm định 10s cho findElement
+//        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // đợi ngầm định 10s cho findElement
         driver.manage().window().maximize();
 
 //        WebDriver driver = new FirefoxDriver(); // geckodriver.exe
@@ -36,15 +40,29 @@ public class DemoWebDriver {
 //        WebDriver driver = new SafariDriver();
 //        driver.get("https://demo1.cybersoft.edu.vn/");
 
+        WebDriverWait webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(30));
+        webDriverWait.withTimeout(Duration.ofSeconds(60));
+        webDriverWait.pollingEvery(Duration.ofSeconds(1));
+
+        FluentWait<WebDriver> fluentWait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(30))
+                .pollingEvery(Duration.ofSeconds(1))
+                .ignoring(NotFoundException.class);
+
         //Step 1: Click link "Đăng Ký"
-        By byBtnRegister = By.xpath("//h3[text()='Đăng Ký']");
+        By byBtnRegister = By.xpath("//h3[text()='Đăng Ký123']");
         ZonedDateTime start = ZonedDateTime.now();
         System.out.println("Start = " + start);
-        WebElement btnRegister = driver.findElement(byBtnRegister); // throw exception "NoSuchElementException" neu ko thay element
-        ZonedDateTime end = ZonedDateTime.now();
-        System.out.println("End = " + end);
-        long duration = ChronoUnit.SECONDS.between(start, end);
-        System.out.println("Duration = " + duration);
+//        WebElement btnRegister = driver.findElement(byBtnRegister); // throw exception "NoSuchElementException" neu ko thay element
+        WebElement btnRegister = null;
+        try {
+            btnRegister = fluentWait.until(ExpectedConditions.visibilityOfElementLocated(byBtnRegister));
+        } catch(Exception e) {
+            ZonedDateTime end = ZonedDateTime.now();
+            System.out.println("End = " + end);
+            long duration = ChronoUnit.SECONDS.between(start, end);
+            System.out.println("Duration = " + duration);
+        }
         btnRegister.click();
 
         //Step 2: Enter account
